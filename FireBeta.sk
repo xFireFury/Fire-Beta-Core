@@ -1,0 +1,105 @@
+#========Fire Beta=========#
+
+on load:
+    load yaml "plugins/FireBeta/config.yml" as "FireBeta"
+    if yaml "FireBeta" is empty:
+        set yaml value "prefix" from "FireBeta" to "§8(§cFire&fBeta§8)"
+        set yaml value "joinmsg" from "FireBeta" to "§8[§a+§8]"
+        set yaml value "leavemsg" from "FireBeta" to "§8[§4-§8]"
+        set yaml value "motd1" from "FireBeta" to "§8[§4Line 1§8]"
+        set yaml value "motd2" from "FireBeta" to "§8[§4Line 2§8]"
+        set yaml value "discord" from "FireBeta" to "§8[§cwww.yourlink.com§8]"
+        set yaml value "teamspeak" from "FireBeta" to "§8[§cwww.yourlink.com§8]"
+        set yaml value "website" from "FireBeta" to "§8[§cwww.yourlink.com§8]"
+        set yaml value "store" from "FireBeta" to "§8[§cwwwyourlink.com§8]"
+        save yaml "FireBeta" without extra lines between nodes
+
+    load yaml "plugins/FireBeta/info.yml" as "Info"
+    if yaml "Info" is empty:
+        set yaml value "creator" from "Info" to "§8- §4ItsYahBoiFire"
+        set yaml value "version" from "Info" to "§8- §42.1"
+        save yaml "Info" without extra lines between nodes
+    
+    set {info::creator} to yaml value "creator" from "Info"
+    set {info::version} to yaml value "version" from "Info"	
+    set {firebeta::prefix} to yaml value "prefix" from "FireBeta"
+    set {firebeta::joinmsg} to yaml value "joinmsg" from "FireBeta"
+    set {firebeta::leavemsg} to yaml value "leavemsg" from "FireBeta"
+    set {firebeta::motd1} to yaml value "motd1" from "FireBeta"
+    set {firebeta::motd2} to yaml value "motd2" from "FireBeta"
+    set {firebeta::discord} to yaml value "discord" from "FireBeta"
+    set {firebeta::teamspeak} to yaml value "teamspeak" from "FireBeta"
+    set {firebeta::website} to yaml value "website" from "FireBeta"
+    set {firebeta::store} to yaml value "store" from "FireBeta"
+
+    broadcast "%colored {firebeta::prefix}% §4FireBeta's Core Was Reloaded."
+    broadcast "%colored {firebeta::prefix}% §4Made By %colored {info::creator}%"
+    broadcast "%colored {firebeta::prefix}% §4Version %colored {info::version}%"
+
+on join:
+    set {_player} to player
+    wait a second
+    broadcast "%colored {firebeta::joinmsg}% %{_player}%"
+    if {Maintenance.on} is 1:
+        if player does not have permission "fire.beta.bypass":
+            wait 1 second
+            execute console command "/kick %player% §8(§cFire&fBeta&cMaintenance§8) &cWere doing some maintenance on our server(-s). Check back in some hours."	
+            broadcast "&4%player% Was Kicked From The Server Because Maintenance Is Activated"			
+on quit:
+    set {_player} to player
+    wait a second
+    broadcast "%colored {firebeta::leavemsg}% %{_player}%"
+	
+on server list ping:
+    if {Maintenance.on} is 1:
+        set motd to "&cWere doing some maintenance on our server(-s). Check back in some hours."
+    else:
+        set motd to "%colored {firebeta::motd1}%%NL%%{firebeta::motd2}%"
+			
+command /firebeta [<text>]:
+    aliases: /fc, /fb
+    trigger:
+        if arg 1 is "help":
+            send "&7&l&m------ &4&lFire &c&lBeta &f&lHelp &7&l&m------"
+            send "&7- &f/firebeta help - Shows This Message"
+            send "&7- &f/maintenance on - Turns On Maintenance"
+            send "&7- &f/maintenance off - Turns Off Maintenance"
+            send "&7- &f/discord - Shows Discord Invite Link"		
+            send "&7- &f/teamspeak - Shows TeamSpeak IP"		
+            send "&7- &f/website - Shows Website Address"		
+            send "&7- &f/store - Shows Store Address"		
+            send "&7&l&m----------------------------"
+
+command /maintenance [<text>]:
+    permission: fire.beta.toggle
+    permission message: %colored {firebeta::prefix}% &cYou dont have permissions to execute this command.
+    trigger:
+        if arg 1 is "on":
+            set {Maintenance.on} to 1
+            send "%colored {firebeta::prefix}% &cYou have enabled Maintenance Mode"
+        if arg 1 is "off":
+            set {Maintenance.on} to 0
+            send "%colored {firebeta::prefix}% &cYou have disabled Maintenance Mode"
+			
+command /discord:
+    executable by: players and console
+    trigger:
+        send message "&aDiscord: %colored {firebeta::discord}%"
+
+command /teamspeak:
+    executable by: players and console
+    trigger:
+        send message "&aTeamspeak IP: %colored {firebeta::teamspeak}%"	
+
+command /website:
+    executable by: players and console
+    trigger:
+        send message "&aWebsite Link: %colored {firebeta::website}%"		
+	
+command /store:
+    executable by: players and console
+    trigger:
+        send message "&aStore Link: %colored {firebeta::store}%"	
+
+on unload:
+    unload yaml "FireBeta"
